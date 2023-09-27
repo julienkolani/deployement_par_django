@@ -1,0 +1,59 @@
+# Stage 1: Construction de l'environnement virtuel et installation des dépendances Django
+FROM debian:stable-slim	 AS builder
+
+RUN mkdir -p /home/app
+
+# Installation des outils nécessaires
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-venv \
+    python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Création de l'environnement virtuel
+RUN python3 -m venv /my_app_venv
+
+# Copie des fichiers du projet Django dans le conteneur
+COPY test_app/requirements.txt /home/app/requirements.txt
+
+# Installation des dépendances Django dans l'environnement virtuel
+RUN /my_app_venv/bin/pip install -r /home/app/requirements.txt && \
+    /my_app_venv/bin/pip install uvicorn
+
+# Stage 2: Création du conteneur final
+FROM debian:stable-slim	
+
+# Copie de l'environnement virtuel depuis le stage précédent
+COPY --from=builder /my_app_venv /home/app/my_app_venv
+
+RUN . /home/app/my_app_venv/bin/activate
+
+ENV workdir=/home/app
+ENV DJANGO_PROJECT_NAME=test_app
+ENV hostname=www.exemple.com
+
+RUN mkdir -p /home/app/test_app
+
+COPY test_app /home/app/test_app
+
+COPY django.config /etc/unit/django.config
+
+COPY run.sh /run.sh
+
+COPY install_unit.sh /install_unit.sh
+
+RUN chmod +x /run.sh && \
+    chmod +x /install_unit.sh && \
+    apt-get update -y && \
+    apt-get install python3 -y && \
+    apt-get -o APT::Install-Recommends=false upgrade -y && \
+    mkdir -p /home/app/test_app/static && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN ./install_unit.sh
+
+EXPOSE 8000
+
+# Exécution du fichier run.sh lors du démarrage du conteneur
+CMD ["/run.sh"]
