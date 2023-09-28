@@ -77,9 +77,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get install -y python3 \
     && apt-get -o APT::Install-Recommends=false upgrade -y \
     && mkdir -p {workdir}/{django_project_name}/static \
-    && apt-get autoremove -y
-
-RUN apt-get update \
+    && apt-get autoremove -y ; \
+    apt-get update \
     && apt-get install -y curl \
     && curl --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bookworm unit" > /etc/apt/sources.list.d/unit.list \
