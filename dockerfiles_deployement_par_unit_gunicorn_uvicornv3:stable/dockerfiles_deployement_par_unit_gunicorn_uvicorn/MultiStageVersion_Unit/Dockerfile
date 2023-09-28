@@ -32,9 +32,7 @@ RUN mkdir -p /home/app/test_app
 COPY test_app /home/app/test_app
 COPY django.config /etc/unit/django.config
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked     --mount=type=cache,target=/var/lib/apt,sharing=locked     rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache     && apt-get update -y     && apt-get install -y python3     && apt-get -o APT::Install-Recommends=false upgrade -y     && mkdir -p /home/app/test_app/static     && apt-get autoremove -y
-
-RUN apt-get update     && apt-get install -y curl     && curl --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg     && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bookworm unit" > /etc/apt/sources.list.d/unit.list     && apt-get update     && apt-get install -y unit unit-dev unit-python3.11
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked     --mount=type=cache,target=/var/lib/apt,sharing=locked     rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache     && apt-get update -y     && apt-get install -y python3     && apt-get -o APT::Install-Recommends=false upgrade -y     && mkdir -p /home/app/test_app/static     && apt-get autoremove -y ;  apt-get update     && apt-get install -y curl     && curl --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg     && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bookworm unit" > /etc/apt/sources.list.d/unit.list     && apt-get update     && apt-get install -y unit unit-dev unit-python3.11
 
 EXPOSE 8000
 
